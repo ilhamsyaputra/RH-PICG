@@ -1,3 +1,4 @@
+import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
 
@@ -18,8 +19,7 @@ layout = html.Div([
                     html.P('Data prakiraan cuaca kabupaten dan kota di Indonesia',
                            className='card-text'),
                     dbc.Button('SELENGKAPNYA', href='/cuaca', color='primary'),
-                ]
-                ),
+                ]),
             ], style={'width': '18rem'})
         ], width='auto'),
         dbc.Col([
@@ -30,8 +30,7 @@ layout = html.Div([
                     html.P('Data kejadian gempabumi yang terjadi di seluruh wilayah Indonesia',
                            className='card-text'),
                     dbc.Button('SELENGKAPNYA', href='/gempa', color='primary'),
-                ]
-                ),
+                ]),
             ], style={'width': '18rem'})
         ], width='auto')
     ], justify='center'),

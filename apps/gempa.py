@@ -11,7 +11,6 @@ from app import app
 
 def getInfo():
     urlData = 'https://data.bmkg.go.id/DataMKG/TEWS/gempaterkini.json'
-
     web = urllib.request.urlopen(urlData)
     if web.getcode() == 200:
         data = web.read()
@@ -53,7 +52,6 @@ def gempaTerbaru():
         lokasi = JSON['Infogempa']['gempa']['Lintang'] + ' ' + JSON['Infogempa']['gempa']['Bujur']
         map = 'https://www.google.com/maps/search/' + JSON['Infogempa']['gempa']['Coordinates']
 
-
         terbaru = dbc.Card(
             dbc.CardBody(
                 [
@@ -93,8 +91,7 @@ def gempaTerbaru():
 
     return terbaru
 
-
-
+# layout web app
 layout = html.Div([
     html.H1('Informasi Gempabumi'),
     html.Hr(),

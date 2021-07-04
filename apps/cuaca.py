@@ -10,8 +10,8 @@ from datetime import datetime, time
 from dash.dependencies import Input, Output, State
 from app import app
 
-kota = []
 
+# layout web app
 layout = html.Div([
     dbc.Row([
         dbc.Col([
@@ -59,13 +59,13 @@ layout = html.Div([
             html.Br(),
         ])
     ], justify='center'),
+
     dbc.Row([
         dbc.Col([
             html.Div(id='outputkota')
         ]),
-
-
     ], justify='center'),
+
     dbc.Row([
         html.Div(id='output')
     ], justify='center'),
@@ -77,20 +77,21 @@ layout = html.Div([
 )
 def update_kota(value):
     if value != None:
-        global doc
+        global doc, ibukota, daftar_kota
         urlXml = 'https://data.bmkg.go.id/DataMKG/MEWS/DigitalForecast/DigitalForecast-' + value + '.xml'
         web = urllib.request.urlopen(urlXml)
         data = web.read()
         doc = ET.fromstring(data)
 
-
         daftar_kota = []
+        ibukota = []
 
         for n, i in enumerate(doc[0]):
             if n == 0:
                 pass
             else:
                 daftar_kota.append(doc[0][n][1].text)
+                ibukota.append(doc[0][n][0].text)
 
         out = dcc.Dropdown(
             id='kota',
@@ -108,23 +109,16 @@ def update_kota(value):
 )
 def update_status(value):
     if value != None:
-
         humidity = doc[0][value + 1][2]
         temperature = doc[0][value + 1][7]
         cuaca = doc[0][value + 1][8]
-        timeseries = []
-        humidity_plot = []
-        temperature_plot = []
-        cuaca_plot = []
-        kondisi_cuaca = []
+        arah_angin = doc[0][1][9]
+        kecepatan_angin = doc[0][1][10]
+        timeseries, humidity_plot, temperature_plot, cuaca_plot, kondisi_cuaca, t_final, arah_angin_df, kecepatan_angin_df = [], [], [], [], [], [], [], []
         kondisi = ''
         t = 0
-        t_final = []
-        arah_angin = doc[0][1][9]
-        arah_angin_df = []
-        kecepatan_angin = doc[0][1][10]
-        kecepatan_angin_df = []
-
+        wilayah = ibukota[value]
+        kota = daftar_kota[value]
 
         df_cuaca = pd.DataFrame()
 
@@ -207,10 +201,6 @@ def update_status(value):
         #
         # df_cuaca['Icon'] = icon
 
-
-
-
-
         batas = max(humidity_plot) + 20
 
         # kelembaban
@@ -224,8 +214,8 @@ def update_status(value):
 
         # temperature
         fig2 = px.line(x=timeseries, y=t_final,
-                       title='Temperature',
-                       labels=dict(x='Waktu', y='Temprature (°C)'))
+                       title='Suhu',
+                       labels=dict(x='Waktu', y='Suhu (°C)'))
         fig2.update_yaxes(fixedrange=True)
         fig2.update_xaxes(fixedrange=True)
         fig2.update_layout(hovermode="x",
@@ -233,6 +223,10 @@ def update_status(value):
 
 
         output_cuaca = html.Div([
+            dbc.Row([
+                html.H3(kota + ' - ' + wilayah)
+            ], style={'margin-top': '10px'}),
+
             dbc.Row([
                 dbc.Col([
                     dcc.Graph(
@@ -251,10 +245,10 @@ def update_status(value):
                     ),
                 ]),
 
-            ], style={'margin-top': '50px'}),
+            ], style={'margin-top': '10px'}),
+
             dbc.Row([
                 dbc.Table.from_dataframe(df_cuaca, striped=True, hover=True),
             ], style={'margin-top': '50px'}),
         ])
-
         return output_cuaca
